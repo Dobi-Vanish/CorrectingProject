@@ -1,0 +1,31 @@
+networks:
+  default:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1450
+services:
+  reward-service:
+    build:
+      context: ./../reward-service
+      dockerfile: ./../reward-service/reward-service.dockerfile
+    restart: always
+    ports:
+      - "8080:82"
+    deploy:
+      mode: replicated
+      replicas: 1
+
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: users
+    volumes:
+      - ./db-data/postgres/:/var/lib/postgresql/data/
