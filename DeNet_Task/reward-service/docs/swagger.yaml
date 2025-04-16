@@ -1,0 +1,377 @@
+basePath: /api/v1
+definitions:
+  calltypes.ErrorResponse:
+    properties:
+      error:
+        example: true
+        type: boolean
+      message:
+        example: Error description
+        type: string
+    type: object
+  calltypes.JSONResponse:
+    description: API response.
+    properties:
+      data: {}
+      error:
+        type: boolean
+      message:
+        type: string
+    type: object
+  calltypes.LoginRequest:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      password:
+        example: securePassword123
+        type: string
+    type: object
+  calltypes.ReferrerRequest:
+    properties:
+      referrer:
+        example: ref123
+        type: string
+    type: object
+  calltypes.RegisterRequest:
+    properties:
+      active:
+        example: 1
+        type: integer
+      email:
+        example: user@example.com
+        type: string
+      firstName:
+        example: John
+        type: string
+      lastName:
+        example: Doe
+        type: string
+      password:
+        example: securePassword123
+        type: string
+      referrer:
+        example: ref123
+        type: string
+      score:
+        example: 0
+        type: integer
+    type: object
+  calltypes.SecretTaskRequest:
+    properties:
+      waterPassword:
+        example: KUARHODRON
+        type: string
+    type: object
+  calltypes.User:
+    description: info about user.
+    properties:
+      active:
+        type: integer
+      createdAt:
+        type: string
+      email:
+        type: string
+      firstName:
+        type: string
+      id:
+        type: integer
+      lastName:
+        type: string
+      referrer:
+        type: string
+      score:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  httputils.JSONResponse:
+    properties:
+      data: {}
+      error:
+        type: boolean
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API for user rewards management system
+  title: Reward Service API
+  version: "1.0"
+paths:
+  /error:
+    get:
+      description: Helper function to send standardized error responses
+      parameters:
+      - description: Error message
+        in: query
+        name: err
+        required: true
+        type: string
+      - default: 400
+        description: HTTP status code
+        in: query
+        name: status
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Standard error response
+          schema:
+            $ref: '#/definitions/httputils.JSONResponse'
+        "401":
+          description: Unauthorized error
+          schema:
+            $ref: '#/definitions/httputils.JSONResponse'
+        "403":
+          description: Forbidden error
+          schema:
+            $ref: '#/definitions/httputils.JSONResponse'
+        "404":
+          description: Not found error
+          schema:
+            $ref: '#/definitions/httputils.JSONResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/httputils.JSONResponse'
+      summary: Return error response in JSON format
+      tags:
+      - Utilities
+  /leaderboard:
+    get:
+      description: Returns all users ordered by score
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/calltypes.JSONResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/calltypes.User'
+                  type: array
+              type: object
+        "400":
+          description: Failed to fetch users
+          schema:
+            $ref: '#/definitions/calltypes.ErrorResponse'
+      summary: Get user leaderboard
+      tags:
+      - Users
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Logs in user and returns auth cookies
+      parameters:
+      - description: Credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/calltypes.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Set-Cookie:
+              description: refreshToken
+              type: string
+          schema:
+            $ref: '#/definitions/calltypes.JSONResponse'
+        "400":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/calltypes.ErrorResponse'
+      summary: Authenticate user
+      tags:
+      - Auth
+  /parse-id/{paramName}:
+    get:
+      description: Parses and validates ID from URL path
+      parameters:
+      - description: URL parameter name containing ID
+        in: path
+        name: paramName
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Valid ID
+          schema:
+            type: integer
+        "400":
+          description: Invalid or empty ID
+          schema:
+            $ref: '#/definitions/calltypes.ErrorResponse'
+      summary: Extract ID from URL parameter
+      tags:
+      - Utilities
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Creates new user account
+      parameters:
+      - description: User registration data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/calltypes.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/calltypes.JSONResponse'
+        "400":
+          description: Invalid request data
+          schema:
+            $ref: '#/definitions/calltypes.ErrorResponse'
+      summary: Register new user
+      tags:
+      - Users
+  /secret-task:
+    post:
+      consumes:
+      - application/json
+      description: Complete secret task with special password
+      parameters:
+      - description: Secret password
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/calltypes.SecretTaskRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/calltypes.JSONResponse'
+        "400":
+          description: Invalid password
+          schema:
+            $ref: '#/definitions/calltypes.ErrorResponse'
+      summary: Secret task endpoint
+      tags:
+      - Tasks
+  /tasks/complete/{id}:
+    post:
+      description: Awards points to user for completing task
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Points to award
+        in: query
+        name: points
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/calltypes.JSONResponse'
+        "400":
+          description: Failed to add points
+          schema:
+            $ref: '#/definitions/calltypes.ErrorResponse'
+      summary: Complete task and earn points
+      tags:
+      - Tasks
+  /tasks/some/{id}:
+    post:
+      description: Awards fixed points for some task
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/calltypes.JSONResponse'
+        "400":
+          description: Invalid user ID
+          schema:
+            $ref: '#/definitions/calltypes.ErrorResponse'
+      summary: Complete some task
+      tags:
+      - Tasks
+  /users/{id}:
+    get:
+      description: Returns single user data
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/calltypes.JSONResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/calltypes.User'
+              type: object
+        "400":
+          description: User not found
+          schema:
+            $ref: '#/definitions/calltypes.ErrorResponse'
+      summary: Get user by ID
+      tags:
+      - Users
+  /users/{id}/referrer:
+    post:
+      consumes:
+      - application/json
+      description: Applies referrer code to user account
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Referrer code
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/calltypes.ReferrerRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/calltypes.JSONResponse'
+        "400":
+          description: Invalid referrer code
+          schema:
+            $ref: '#/definitions/calltypes.ErrorResponse'
+      summary: Redeem referrer code
+      tags:
+      - Users
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
