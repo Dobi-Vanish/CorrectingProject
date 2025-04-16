@@ -372,7 +372,7 @@ func (s *RewardService) RetrieveOne(w http.ResponseWriter, r *http.Request) {
 
 // RedeemReferrer godoc
 // @Summary Redeem referrer code
-// @Description Applies referrer code to user account
+// @Description Applies referrer code to user account. Those, who entered the referrer is granted by 100 points, those, whom referrer were redeemed, claims 25 points.
 // @Tags Users
 // @Accept json
 // @Param id path int true "User ID"
