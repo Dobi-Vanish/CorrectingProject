@@ -30,3 +30,6 @@
    ```bash
    cd reward-service/deployments
    make up_build
+### Пример успешного запроса
+ Запуск коллекции в Postman для проверки:  
+ ![изображение](https://github.com/user-attachments/assets/6e12e9d7-f245-47a7-8035-56c0fb5df0cf)  
