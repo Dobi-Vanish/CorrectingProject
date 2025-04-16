@@ -25,5 +25,4 @@
 ### Запуск локально
 1. Клонируйте репозиторий:
    ```bash
-   git clone https://github.com/ваш-username/название-репозитория.git
-   cd название-репозитория
+   git clone https://github.com/Dobi-Vanish/CorrectingProject
