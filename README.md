@@ -26,4 +26,7 @@
 1. Клонируйте репозиторий:
    ```bash
    git clone https://github.com/Dobi-Vanish/CorrectingProject
-
+2. Перейдите в папку deployments и запустите через makefile:
+   ```bash
+   cd reward-service/deployments
+   make up_build
